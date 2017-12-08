@@ -5,7 +5,7 @@ import mastercard_logo from './mastercard.png';
 
 export default class CreditCard extends Component {
     render() {
-        const { card } = this.props;
+        const { card, onCharge } = this.props;
         const card_logo = card.brand === 'Visa' ? visa_logo : mastercard_logo;
         return (
             <Card>
@@ -20,10 +20,10 @@ export default class CreditCard extends Component {
                     <Card.Description>
                         <strong>Expires: {card.exp_month} / {card.exp_year}</strong>
                     </Card.Description>
-                    </Card.Content>
-                    <Card.Content extra>
+                </Card.Content>
+                <Card.Content extra>
                     <div className='ui buttons'>
-                        <Button basic color='blue'>Charge</Button>
+                        <Button basic color='blue' onClick={(e) => { onCharge(card.id) }}>Charge</Button>
                     </div>
                 </Card.Content>
             </Card>

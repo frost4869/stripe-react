@@ -4,11 +4,13 @@ import { Container, Header, Loader } from 'semantic-ui-react';
 import 'semantic-ui-css/semantic.min.css';
 import { TabMenu, Tab } from './tab-menu';
 import Checkout from './check-out';
+import Keys from './keys.json';
+import ChargeModal from './charge-modal';
 
-//kill me plz
-const customer_id = `cus_BtheIaqB5sLKFs`;
-const secret_key = `sk_test_qGlg5kMzEsl6fxOt8V155Mgg`;
-const public_key = `pk_test_DOMo8Imqw2zQshxw63WlKy3h`;
+//create keys.json in /src to import your own keys
+const customer_id = Keys.customer_id;
+const secret_key = Keys.secret_key;
+const public_key = Keys.public_key;
 
 class App extends Component {
 
@@ -18,8 +20,16 @@ class App extends Component {
     this.state = {
       cards: [],
       loading: true,
-      status: ''
+      status: '',
+      isOpenChargeModal: false,
+      chargeType: 'normal',
     }
+
+    this.handleNormalCharge = this.handleNormalCharge.bind(this);
+    this.onModalClose = this.onModalClose.bind(this);
+    this.handleCustomCard = this.handleCustomCard.bind(this);
+    this.onNormalCharge = this.onNormalCharge.bind(this);
+    this.onCustomCharge = this.onCustomCharge.bind(this);
   }
 
   async fetchCard() {
@@ -45,10 +55,37 @@ class App extends Component {
       })
   }
 
+  handleNormalCharge(card_id) {
+    this.setState({
+      chargeType: 'normal',
+      isOpenChargeModal: true
+    })
+  }
+
   async componentDidMount() {
     await this.fetchCard();
   }
 
+  onModalClose() {
+    this.setState({
+      isOpenChargeModal: false
+    })
+  }
+
+  handleCustomCard() {
+    this.setState({
+      chargeType: 'custom',
+      isOpenChargeModal: true
+    })
+  }
+
+  onNormalCharge(form) {
+    console.log(form)
+  }
+
+  onCustomCharge(form) {
+    console.log(form)
+  }
 
   render() {
 
@@ -59,7 +96,7 @@ class App extends Component {
       Content = (
         <TabMenu>
           <Tab default title="Checkout">
-            <Checkout cards={this.state.cards} />
+            <Checkout cards={this.state.cards} onCharge={this.handleNormalCharge} handleCustomCard={this.handleCustomCard} />
           </Tab>
           <Tab title="Payments">
             <h1>Payments</h1>
@@ -75,6 +112,11 @@ class App extends Component {
       <Container style={{ marginTop: '3em' }}>
         <Header as='h1'>Stripe React</Header>
         {Content}
+        <ChargeModal isOpen={this.state.isOpenChargeModal}
+          onClose={this.onModalClose}
+          type={this.state.chargeType}
+          onNormalCharge={this.onNormalCharge}
+          onCustomCharge={this.onCustomCharge} />
       </Container>
     );
   }
