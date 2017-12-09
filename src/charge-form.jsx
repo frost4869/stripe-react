@@ -51,7 +51,7 @@ export class CardDetailChargeForm extends Component {
 
         this.state = {
             cardNumber: '',
-            expireMont: 0,
+            expireMonth: 0,
             expireYear: 0,
             amount: '',
             currency: '',
@@ -79,7 +79,7 @@ export class CardDetailChargeForm extends Component {
                 </Form.Field>
                 <Form.Field>
                     <label>Expire Month</label>
-                    <input placeholder='Expire Month' name="expireMont" onChange={this.handleInputChanges} />
+                    <input placeholder='Expire Month' name="expireMonth" onChange={this.handleInputChanges} />
                 </Form.Field>
                 <Form.Field>
                     <label>Expire Year</label>
