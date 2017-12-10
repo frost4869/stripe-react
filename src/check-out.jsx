@@ -1,4 +1,4 @@
-import React, { Component, Text } from 'react'
+import React, { Component } from 'react'
 import { Header, Container, Card, Divider, Button } from 'semantic-ui-react';
 import CardList from './card-list';
 

@@ -6,7 +6,8 @@ import { TabMenu, Tab } from './tab-menu';
 import Checkout from './check-out';
 import Keys from './keys.json';
 import ChargeModal from './charge-modal';
-import { ErrorAlert, SuccessAlert } from './custom-alert'
+import { ErrorAlert, SuccessAlert } from './custom-alert';
+import ChargeList from './charge-list';
 
 //create keys.json in /src to import your own keys
 const customer_id = Keys.customer_id;
@@ -55,8 +56,6 @@ class App extends Component {
       .then((cards) => {
         this.setState({
           cards,
-          loading: false,
-          status: ''
         })
       })
   }
@@ -71,6 +70,11 @@ class App extends Component {
 
   async componentDidMount() {
     await this.fetchCard();
+    await this.fetchCharges();
+    this.setState({
+      loading: false,
+      status: ''
+    })
   }
 
   onModalClose() {
@@ -176,6 +180,26 @@ class App extends Component {
       })
   }
 
+  async fetchCharges(){
+    const charge_uri = `https://api.stripe.com/v1/charges?limit=100`;
+    this.setState({
+      status: 'Loading Charges...'
+    })
+    await fetch(charge_uri, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${secret_key}`,
+      }
+    })
+      .then((data) => data.json())
+      .then((charges) => {
+        this.setState({
+          charges,
+        })
+      })
+  }
+
   render() {
 
     let Content;
@@ -188,7 +212,7 @@ class App extends Component {
             <Checkout cards={this.state.cards} onCharge={this.handleNormalCharge} handleCustomCard={this.handleCustomCard} />
           </Tab>
           <Tab title="Payments">
-            <h1>Payments</h1>
+            <ChargeList data={this.state.charges.data}/>
           </Tab>
           <Tab title="Dispute">
             <h1>Dispute</h1>

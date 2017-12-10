@@ -5106,6 +5106,12 @@ rc@^1.0.1, rc@^1.1.6, rc@^1.1.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
+react-bootstrap-sweetalert@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/react-bootstrap-sweetalert/-/react-bootstrap-sweetalert-4.1.0.tgz#1e9297af13e2084a25b95062dcda2c02a57498d6"
+  dependencies:
+    object-assign "^4.1.0"
+
 react-dev-utils@^4.2.1:
   version "4.2.1"
   resolved "https://registry.yarnpkg.com/react-dev-utils/-/react-dev-utils-4.2.1.tgz#9f2763e7bafa1a1b9c52254d2a479deec280f111"
@@ -5184,6 +5190,12 @@ react-scripts@1.0.17:
     whatwg-fetch "2.0.3"
   optionalDependencies:
     fsevents "1.1.2"
+
+react-table@^6.7.4:
+  version "6.7.4"
+  resolved "https://registry.yarnpkg.com/react-table/-/react-table-6.7.4.tgz#cd23e15d437034bf2374e9c8d343e1b4e1960e4f"
+  dependencies:
+    classnames "^2.2.5"
 
 react@^16.2.0:
   version "16.2.0"

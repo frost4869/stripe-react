@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Modal, Header } from 'semantic-ui-react'
+import { Modal } from 'semantic-ui-react'
 import { CardDetailChargeForm, ChargeForm } from './charge-form'
 
 export default class ChargeModal extends Component {
