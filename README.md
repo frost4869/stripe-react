@@ -36,6 +36,10 @@ Charge from custom card: https://i.imgur.com/FQdff2B.gif
 
 GIF created with [Peek](https://github.com/phw/peek).
 
+## Note
+
+After running "npm install", copy files from /customize folder and replace files in /node_modules/react-bootstrap-sweetalert/lib/dist to resolve sweetalert bootstrap button errors.
+
 ## License
 
     Copyright [2017] [Son Nguyen]
