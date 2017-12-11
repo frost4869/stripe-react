@@ -49,12 +49,12 @@ export class TabMenu extends Component {
         return (
             <Container>
                 <Grid>
-                    <Grid.Column width={4}>
+                    <Grid.Column width={3}>
                         <Menu vertical>
                             {Tab}
                         </Menu>
                     </Grid.Column>
-                    <Grid.Column stretched width={12}>
+                    <Grid.Column stretched width={13}>
                         <Transition animation='fade' duration={5000}>
                             {TabContent}
                         </Transition>

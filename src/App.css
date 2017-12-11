@@ -31,11 +31,23 @@
   color: #6772e5;
 }
 
-.loader{
-    position: fixed;
-    top: 50%;
-    right: 0;
-    z-index: 1000;
+.ui.dimmer .ui.loader:before{
+  border-color: rgba(128, 128, 128, 0.33);
+}
+
+.ui.dimmer .ui.loader:after{
+  border-color: #505050 transparent transparent;
+}
+
+.ui.container{
+  width: 1260px !important;
+}
+
+.ReactTable .rt-thead{
+    font-size: 15px;
+    font-weight: bold;
+    background-color: #f1f5f9;
+    color: #32325d;
 }
 
 @keyframes App-logo-spin {

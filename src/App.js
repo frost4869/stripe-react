@@ -5,8 +5,6 @@ import 'semantic-ui-css/semantic.min.css';
 import { TabMenu, Tab } from './tab-menu';
 import Checkout from './check-out';
 import Keys from './keys.json';
-import ChargeModal from './charge-modal';
-import { ErrorAlert, SuccessAlert } from './custom-alert';
 import ChargeList from './charge-list';
 
 //create keys.json in /src to import your own keys
@@ -21,7 +19,7 @@ class App extends Component {
 
     this.state = {
       cards: [],
-      charges:[],
+      charges: [],
       loading: true,
       status: '',
       isOpenChargeModal: false,
@@ -31,6 +29,7 @@ class App extends Component {
       showErrorAlert: false,
       alertTitle: '',
       alertMessage: '',
+      isCharging: false
     }
 
     this.handleNormalCharge = this.handleNormalCharge.bind(this);
@@ -91,6 +90,9 @@ class App extends Component {
   }
 
   async onNormalCharge(data) {
+    this.setState({
+      status: 'Charging...'
+    })
     const charge_uri = `https://api.stripe.com/v1/charges`;
     this.setState({
       status: 'Charging...'
@@ -128,7 +130,8 @@ class App extends Component {
     const charge_uri = `https://api.stripe.com/v1/charges`;
     const tokens_uri = `https://api.stripe.com/v1/tokens`;
     this.setState({
-      status: 'Charging...'
+      status: 'Charging...',
+      isCharging: true
     })
 
     await fetch(tokens_uri, {
@@ -180,7 +183,7 @@ class App extends Component {
       })
   }
 
-  async fetchCharges(){
+  async fetchCharges() {
     const charge_uri = `https://api.stripe.com/v1/charges?limit=100`;
     this.setState({
       status: 'Loading Charges...'
@@ -209,10 +212,25 @@ class App extends Component {
       Content = (
         <TabMenu>
           <Tab default title="Checkout">
-            <Checkout cards={this.state.cards} onCharge={this.handleNormalCharge} handleCustomCard={this.handleCustomCard} />
+            <Checkout cards={this.state.cards}
+              onCharge={this.handleNormalCharge}
+              handleCustomCard={this.handleCustomCard}
+              isOpenModal={this.state.isOpenChargeModal}
+              onCloseModal={this.onModalClose}
+              type={this.state.chargeType}
+              onNormalCharge={this.onNormalCharge}
+              onCustomCharge={this.onCustomCharge}
+              isCharging={this.state.isCharging}
+              alertTitle={this.state.alertTitle}
+              alertMessage={this.state.alertMessage}
+              showSuccessAlert={this.state.showSuccessAlert}
+              showErrorAlert={this.state.showErrorAlert}
+              onConfirmSuccessAlert={() => this.setState({ showSuccessAlert: false })}
+              onConfimErrorAlert={() => this.setState({ showErrorAlert: false })}
+            />
           </Tab>
           <Tab title="Payments">
-            <ChargeList data={this.state.charges.data}/>
+            <ChargeList data={this.state.charges.data} />
           </Tab>
           <Tab title="Dispute">
             <h1>Dispute</h1>
@@ -225,22 +243,6 @@ class App extends Component {
       <Container style={{ marginTop: '3em' }}>
         <Header as='h1'>Stripe React</Header>
         {Content}
-
-        <ChargeModal isOpen={this.state.isOpenChargeModal}
-          onClose={this.onModalClose}
-          type={this.state.chargeType}
-          onNormalCharge={this.onNormalCharge}
-          onCustomCharge={this.onCustomCharge} />
-
-        <SuccessAlert title={this.state.alertTitle} onShow={this.state.showSuccessAlert}
-          onConfirm={() => this.setState({ showSuccessAlert: false })}
-          message={this.state.alertMessage} />
-
-        <ErrorAlert title={this.state.alertTitle} onShow={this.state.showErrorAlert}
-          onConfirm={() => this.setState({ showErrorAlert: false })}
-          showCancel={true}
-          message={this.state.alertMessage} />
-
       </Container>
     );
   }

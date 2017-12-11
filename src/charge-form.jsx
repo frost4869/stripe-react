@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { Form, TextArea, Button } from 'semantic-ui-react'
+import { Form, TextArea, Button, Dropdown, Loader, Dimmer } from 'semantic-ui-react'
+import 'semantic-ui-css/semantic.min.css';
 
 export class ChargeForm extends Component {
     constructor(props) {
@@ -12,6 +13,7 @@ export class ChargeForm extends Component {
         }
 
         this.handleInputChanges = this.handleInputChanges.bind(this)
+        this.handleCurrencyChanges = this.handleCurrencyChanges.bind(this);
     }
 
     handleInputChanges(e) {
@@ -20,9 +22,15 @@ export class ChargeForm extends Component {
         })
     }
 
+    handleCurrencyChanges = (e, { value }) => {
+        this.setState({
+            currency: value
+        })
+    }
+
     render() {
 
-        const { onCharge } = this.props
+        const { onCharge, currencies } = this.props
 
         return (
             <Form>
@@ -32,13 +40,14 @@ export class ChargeForm extends Component {
                 </Form.Field>
                 <Form.Field>
                     <label>Currency</label>
-                    <input placeholder='Currency' name="currency" onChange={this.handleInputChanges} />
+                    <Dropdown search selection placeholder='Currency' name="currency" options={currencies} onChange={this.handleCurrencyChanges} />
                 </Form.Field>
                 <Form.Field>
                     <label>Description</label>
                     <TextArea placeholder='Description' name="description" onChange={this.handleInputChanges} />
                 </Form.Field>
                 <Button type='button' primary onClick={(e) => { onCharge(this.state) }}>Charge</Button>
+                <Loader inverted={true} />
             </Form>
         )
     }
@@ -59,6 +68,7 @@ export class CardDetailChargeForm extends Component {
         }
 
         this.handleInputChanges = this.handleInputChanges.bind(this)
+        this.handleCurrencyChanges = this.handleCurrencyChanges.bind(this);
     }
 
     handleInputChanges(e) {
@@ -67,9 +77,15 @@ export class CardDetailChargeForm extends Component {
         })
     }
 
+    handleCurrencyChanges = (e, { value }) => {
+        this.setState({
+            currency: value
+        })
+    }
+
     render() {
 
-        const { onCustomCharge } = this.props
+        const { onCustomCharge, currencies } = this.props
 
         return (
             <Form>
@@ -91,7 +107,7 @@ export class CardDetailChargeForm extends Component {
                 </Form.Field>
                 <Form.Field>
                     <label>Currency</label>
-                    <input placeholder='Currency' name="currency" onChange={this.handleInputChanges} />
+                    <Dropdown search selection placeholder='Currency' name="currency" options={currencies} onChange={this.handleCurrencyChanges} />
                 </Form.Field>
                 <Form.Field>
                     <label>Description</label>
@@ -100,5 +116,15 @@ export class CardDetailChargeForm extends Component {
                 <Button type='button' primary onClick={(e) => { onCustomCharge(this.state) }}>Charge</Button>
             </Form>
         )
+    }
+}
+
+const styles = {
+    loader: {
+        position: 'fixed',
+        top: '40%',
+        right: 0,
+        zIndex: 100000,
+        color: 'black'
     }
 }
