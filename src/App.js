@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import './App.css';
-import { Container, Header, Loader } from 'semantic-ui-react';
+import { Container, Header } from 'semantic-ui-react';
 import 'semantic-ui-css/semantic.min.css';
 import { TabMenu, Tab } from './tab-menu';
 import Checkout from './check-out';
 import Keys from './keys.json';
 import ChargeList from './charge-list';
+import Spinner from 'react-spinkit';
+import { ErrorAlert, SuccessAlert } from './custom-alert';
 
 //create keys.json in /src to import your own keys
 const customer_id = Keys.customer_id;
@@ -24,12 +26,16 @@ class App extends Component {
       status: '',
       isOpenChargeModal: false,
       chargeType: 'normal',
-      card_id: '', //this is so wrong in so many level
+      card_id: '', //this is so wrong in so many level,
+      charge: {},
       showSuccessAlert: false,
       showErrorAlert: false,
       alertTitle: '',
       alertMessage: '',
-      isCharging: false
+      isCharging: false,
+      isRefunding: false,
+      isOpenRefundModal: false,
+      isOpenPaymentDetailsModal: false
     }
 
     this.handleNormalCharge = this.handleNormalCharge.bind(this);
@@ -37,6 +43,10 @@ class App extends Component {
     this.handleCustomCard = this.handleCustomCard.bind(this);
     this.onNormalCharge = this.onNormalCharge.bind(this);
     this.onCustomCharge = this.onCustomCharge.bind(this);
+    this.onRefund = this.onRefund.bind(this);
+    this.onViewDetails = this.onViewDetails.bind(this);
+    this.refund = this.refund.bind(this);
+    this.handleRefresh = this.handleRefresh.bind(this);
   }
 
   async fetchCard() {
@@ -78,7 +88,9 @@ class App extends Component {
 
   onModalClose() {
     this.setState({
-      isOpenChargeModal: false
+      isOpenChargeModal: false,
+      isOpenPaymentDetailsModal: false,
+      isOpenRefundModal: false
     })
   }
 
@@ -90,12 +102,10 @@ class App extends Component {
   }
 
   async onNormalCharge(data) {
-    this.setState({
-      status: 'Charging...'
-    })
     const charge_uri = `https://api.stripe.com/v1/charges`;
     this.setState({
-      status: 'Charging...'
+      status: 'Charging...',
+      isCharging: true
     })
 
     await fetch(charge_uri, {
@@ -112,7 +122,8 @@ class App extends Component {
           this.setState({
             showSuccessAlert: true,
             alertMessage: 'Charge id: ' + response.id,
-            alertTitle: 'Done !'
+            alertTitle: 'Done !',
+            isCharging: false
           })
         } else {
           if (response.error) {
@@ -159,7 +170,8 @@ class App extends Component {
                 this.setState({
                   showSuccessAlert: true,
                   alertMessage: 'Charge id: ' + response.id,
-                  alertTitle: 'Done !'
+                  alertTitle: 'Done !',
+                  isCharging: false
                 })
               } else {
                 if (response.error) {
@@ -203,11 +215,75 @@ class App extends Component {
       })
   }
 
+  onRefund(charge) {
+    this.setState({
+      isOpenRefundModal: true,
+      charge
+    })
+  }
+
+  async refund(data) {
+    const charge = this.state.charge;
+    const refund_uri = `https://api.stripe.com/v1/refunds`;
+    this.setState({
+      isRefunding: true
+    })
+
+    await fetch(refund_uri, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${secret_key}`,
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: `charge=${charge.id}&amount=${data.amount}&reason=${data.reason}`
+    }).then((data) => data.json())
+      .then((response) => {
+        if (response.status === 'succeeded') {
+          this.setState({
+            showSuccessAlert: true,
+            alertMessage: 'Refund id: ' + response.id,
+            alertTitle: 'Done !',
+            isCharging: false
+          })
+        } else {
+          if (response.error) {
+            this.setState({
+              showErrorAlert: true,
+              alertMessage: response.error.message,
+              alertTitle: 'Error !'
+            })
+          }
+        }
+      })
+  }
+
+  onViewDetails(charge) {
+    this.setState({
+      isOpenPaymentDetailsModal: true,
+    })
+  }
+
+  handleRefresh(){
+    this.setState({
+      charges:[]
+    }, async () => {
+      await this.fetchCharges();
+    })
+  }
+
   render() {
 
     let Content;
     if (this.state.loading) {
-      Content = <Loader inline='centered' active style={styles.loader} size='large'>{this.state.status}</Loader>
+      Content = (
+        <div className="ui text" style={styles.loader}>
+          <Spinner name="double-bounce" fadeIn='none' style={{ width: '60px', height: '60px', margin: 'auto' }}></Spinner>
+          <p>
+            {this.state.status}
+          </p>
+        </div>
+      )
     } else {
       Content = (
         <TabMenu>
@@ -221,19 +297,15 @@ class App extends Component {
               onNormalCharge={this.onNormalCharge}
               onCustomCharge={this.onCustomCharge}
               isCharging={this.state.isCharging}
-              alertTitle={this.state.alertTitle}
-              alertMessage={this.state.alertMessage}
-              showSuccessAlert={this.state.showSuccessAlert}
-              showErrorAlert={this.state.showErrorAlert}
-              onConfirmSuccessAlert={() => this.setState({ showSuccessAlert: false })}
-              onConfimErrorAlert={() => this.setState({ showErrorAlert: false })}
             />
           </Tab>
           <Tab title="Payments">
-            <ChargeList data={this.state.charges.data} />
-          </Tab>
-          <Tab title="Dispute">
-            <h1>Dispute</h1>
+            <ChargeList data={this.state.charges.data} onRefund={this.onRefund} refund={this.refund}
+              onViewDetails={this.onViewDetails}
+              isOpenRefundModal={this.state.isOpenRefundModal}
+              isOpenPaymentDetailsModal={this.state.isOpenPaymentDetailsModal}
+              onModalClose={this.onModalClose} 
+              handleRefresh={this.handleRefresh}/>
           </Tab>
         </TabMenu>
       )
@@ -243,6 +315,15 @@ class App extends Component {
       <Container style={{ marginTop: '3em' }}>
         <Header as='h1'>Stripe React</Header>
         {Content}
+
+        <SuccessAlert title={this.state.alertTitle} onShow={this.state.showSuccessAlert}
+          onConfirm={() => this.setState({ showSuccessAlert: false })}
+          message={this.state.alertMessage} />
+
+        <ErrorAlert title={this.state.alertTitle} onShow={this.state.showErrorAlert}
+          onConfirm={() => this.setState({ showErrorAlert: false })}
+          showCancel={true}
+          message={this.state.alertMessage} />
       </Container>
     );
   }
@@ -253,7 +334,9 @@ const styles = {
     position: 'fixed',
     top: '40%',
     right: 0,
-    zIndex: 1000
+    left: 0,
+    zIndex: 1000,
+    textAlign: 'center'
   }
 }
 

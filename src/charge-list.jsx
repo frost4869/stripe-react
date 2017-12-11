@@ -1,13 +1,15 @@
 import React, { Component } from 'react'
 import ReactTable from 'react-table'
 import 'react-table/react-table.css'
-import { Container, Header, Card } from 'semantic-ui-react'
+import { Container, Header, Card, Modal, Button } from 'semantic-ui-react'
 import CurrencyFormatter from 'react-currency-formatter';
-import { Popup, Icon, Label } from 'semantic-ui-react'
+import { Popup, Icon, Label, Menu } from 'semantic-ui-react'
+import { TableMenu } from './tab-menu'
+import { RefundForm } from './charge-form'
 
 export default class ChargeList extends Component {
     render() {
-        const { data } = this.props
+        const { data, onRefund, refund, onViewDetails, isOpenRefundModal, isOpenPaymentDetailsModal, onModalClose, handleRefresh } = this.props
 
         const columns = [
             {
@@ -76,6 +78,7 @@ export default class ChargeList extends Component {
                         </span>
                     )
                 },
+                minWidth: 230
             },
             {
                 Header: 'Customer',
@@ -90,10 +93,33 @@ export default class ChargeList extends Component {
                     return t.toLocaleString();
                 }
             },
+            {
+                id: 'actions',
+                accessor: a => {
+                    return (
+                        <div style={{ textAlign: 'center' }}>
+                            <Popup
+                                flowing
+                                hoverable
+                                trigger={
+                                    <Label><Icon style={styles.icon} name="ellipsis horizontal" /></Label>
+                                }>
+                                <TableMenu onRefund={onRefund} onViewDetails={onViewDetails}
+                                    charge={{ id: a.id, currency: a.currency }} />
+                            </Popup>
+                        </div>
+                    )
+                },
+                minWidth: 77
+            }
         ]
         return (
             <Container>
-                <Header as='h1' className="stripe-header">Payments</Header>
+                <Header as='h1' className="stripe-header">
+                    Payments
+                    <Button floated='right'  color='blue' onClick={handleRefresh}>Refresh</Button>
+                </Header>
+
                 <Card fluid>
                     <Card.Content>
                         <ReactTable
@@ -104,8 +130,29 @@ export default class ChargeList extends Component {
                         />
                     </Card.Content>
                 </Card>
+
+                <Modal open={isOpenRefundModal} closeOnDimmerClick onClose={onModalClose} size='tiny'>
+                    <Modal.Header>Refund</Modal.Header>
+                    <Modal.Content>
+                        <RefundForm refund={refund} />
+                    </Modal.Content>
+                </Modal>
+
+                <Modal open={isOpenPaymentDetailsModal} closeOnDimmerClick onClose={onModalClose} size='tiny'>
+                    <Modal.Header>Payment Details</Modal.Header>
+                    <Modal.Content>
+                        <p>Function currentlly developing...</p>
+                    </Modal.Content>
+                </Modal>
             </Container>
 
         )
+    }
+}
+
+const styles = {
+    icon: {
+        fontSize: '17px',
+        margin: 0
     }
 }

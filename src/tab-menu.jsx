@@ -15,7 +15,6 @@ export class TabMenu extends Component {
         })
         this.state = {
             activeItem: defaultTab,
-            visible: false
         }
         this.handleItemClick = this.handleItemClick.bind(this);
     }
@@ -23,7 +22,6 @@ export class TabMenu extends Component {
     handleItemClick = (e, { name }) => {
         this.setState({
             activeItem: name,
-            visible: !this.state.visible
         })
     }
 
@@ -69,5 +67,29 @@ export class TabMenu extends Component {
 export class Tab extends Component {
     render() {
         return this.props.children;
+    }
+}
+
+export class TableMenu extends Component {
+    render() {
+        const {onRefund, onViewDetails, charge} = this.props;
+        return (
+            <Menu vertical>
+                <Menu.Item>
+                    <Menu.Header>Actions</Menu.Header>
+                    <Menu.Menu>
+                        <Menu.Item name='refund' onClick={() => onRefund(charge)}/>
+                    </Menu.Menu>
+                </Menu.Item>
+                <Menu.Item>
+                    <Menu.Header>Connections</Menu.Header>
+                    <Menu.Menu>
+                        <Menu.Item name='detail' onClick={() => onViewDetails(charge)}>
+                            Payment Details
+                        </Menu.Item>
+                    </Menu.Menu>
+                </Menu.Item>
+            </Menu>
+        )
     }
 }

@@ -11,8 +11,6 @@ const currencies = SupportedCurrencies.map((c) => {
     }
 })
 
-console.log(currencies);
-
 export default class ChargeModal extends Component {
     render() {
         const { isOpen, onClose, type, onNormalCharge, onCustomCharge, isCharging } = this.props;
