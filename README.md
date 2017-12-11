@@ -31,10 +31,10 @@ The following **additional** features are implemented:
 Here's a walkthrough of implemented user stories:
 
 Charge from cards:
-![Charge from cards](https://i.imgur.com/FQdff2B.gif)
+![](https://i.imgur.com/FQdff2B.gif)
 
 Charge from custom card:
-![Charge from cards](https://i.imgur.com/YXUwKgh.gif)
+![](https://i.imgur.com/YXUwKgh.gif)
 
 GIF created with [Peek](https://github.com/phw/peek).
 
